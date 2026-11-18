@@ -1,1 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QwenOS – Cloud Linux System</title>
+    <style>
+        /* === СТИЛИ QWENOS === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #0a0e27; color: #e3f2fd; user-select: none; }
+        
+        /* Иконки (SVG Data URI) */
+        .icon { width: 48px; height: 48px; display: inline-block; background-size: contain; background-repeat: no-repeat; background-position: center; }
+        .icon-sm { width: 20px; height: 20px; }
+        
+        .folder { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2364B5F6' d='M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z'/%3E%3C/svg%3E"); }
+        .browser { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%2342A5F5'/%3E%3Cellipse cx='12' cy='12' rx='10' ry='4' fill='none' stroke='white' stroke-width='1.5' transform='rotate(45 12 12)'/%3E%3Cellipse cx='12' cy='12' rx='10' ry='4' fill='none' stroke='white' stroke-width='1.5' transform='rotate(-45 12 12)'/%3E%3Ccircle cx='12' cy='12' r='3' fill='white'/%3E%3C/svg%3E"); }
+        .terminal { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='4' width='20' height='16' rx='2' fill='%23263238'/%3E%3Cpath d='M6 8l4 4-4 4m6 0h6' stroke='%2300E676' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }
+        .settings { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2390A4AE' d='M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.27.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z'/%3E%3C/svg%3E"); }
+        .notes { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23FFEB3B' d='M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z'/%3E%3Cpath fill='%23FBC02D' d='M14 2v6h6'/%3E%3Cpath fill='white' d='M8 12h8v2H8zm0 4h8v2H8z'/%3E%3C/svg%3E"); }
+        .calc { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='2' width='16' height='20' rx='2' fill='%23546E7A'/%3E%3Crect x='6' y='4' width='12' height='4' fill='%23B0BEC5'/%3E%3Ccircle cx='8' cy='12' r='1.5' fill='white'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='white'/%3E%3Ccircle cx='16' cy='12' r='1.5' fill='white'/%3E%3Ccircle cx='8' cy='16' r='1.5' fill='white'/%3E%3Ccircle cx='12' cy='16' r='1.5' fill='white'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='white'/%3E%3C/svg%3E"); }
+        .start-logo { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2364B5F6' d='M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z'/%3E%3Ctext x='7' y='17' font-size='8' fill='white' font-family='monospace'%3E&lt;/&gt;%3C/text%3E%3C/svg%3E"); }
 
+        /* Рабочий стол */
+        #desktop { width: 100vw; height: calc(100vh - 48px); background: linear-gradient(135deg, #0a0e27 0%, #1a237e 50%, #0d47a1 100%); position: relative; padding: 20px; background-image: linear-gradient(rgba(100, 181, 246, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 181, 246, 0.03) 1px, transparent 1px); background-size: 40px 40px; }
+        .desktop-icons { display: grid; grid-template-columns: repeat(auto-fill, 80px); gap: 20px; }
+        .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 10px; border-radius: 8px; transition: 0.2s; }
+        .app-icon:hover { background: rgba(100, 181, 246, 0.15); }
+        .app-icon span { font-size: 12px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center; margin-top: 5px; color: #e3f2fd; }
+
+        /* Панель задач */
+        #taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 48px; background: rgba(10, 14, 39, 0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: space-between; padding: 0 10px; z-index: 1000; border-top: 1px solid rgba(100, 181, 246, 0.2); }
+        .taskbar-left, .taskbar-center, .taskbar-right { display: flex; align-items: center; gap: 8px; }
+        .start-btn { background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 6px; }
+        .start-btn:hover { background: rgba(100, 181, 246, 0.2); }
+        #clock { font-size: 14px; padding: 0 10px; color: #bbdefb; font-family: monospace; }
+
+        /* Меню Пуск */
+        #start-menu { position: fixed; bottom: 58px; left: 10px; width: 280px; background: rgba(13, 20, 50, 0.98); backdrop-filter: blur(20px); border-radius: 12px; padding: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); z-index: 999; border: 1px solid rgba(100, 181, 246, 0.2); }
+        #start-menu.hidden { display: none; }
+        #start-menu h2 { margin-bottom: 15px; font-size: 18px; padding-left: 5px; border-bottom: 1px solid rgba(100, 181, 246, 0.2); padding-bottom: 10px; color: #64b5f6; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; color: #e3f2fd; }
+        .menu-item:hover { background: rgba(100, 181, 246, 0.15); }
+        .power-btn { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(100, 181, 246, 0.2); display: flex; gap: 10px; }
+        .power-item { flex: 1; padding: 8px; background: rgba(100, 181, 246, 0.1); border-radius: 6px; text-align: center; cursor: pointer; font-size: 12px; color: #bbdefb; }
+        .power-item:hover { background: rgba(100, 181, 246, 0.2); }
+
+        /* Окна */
+        .window { position: absolute; background: rgba(20, 27, 55, 0.98); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); min-width: 350px; min-height: 250px; overflow: hidden; border: 1px solid rgba(100, 181, 246, 0.2); display: flex; flex-direction: column; }
+        .window-header { background: rgba(30, 40, 70, 0.95); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid rgba(100, 181, 246, 0.1); }
+        .window-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: #e3f2fd; }
+        .window-controls { display: flex; gap: 8px; }
+        .window-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; }
+        .window-btn.close { background: #ff5f57; }
+        .window-btn.minimize { background: #febc2e; }
+        .window-btn.maximize { background: #28c840; }
+        .window-content { padding: 15px; flex: 1; overflow: auto; font-size: 14px; position: relative; color: #e3f2fd; }
+
+        /* Файловый менеджер */
+        .file-list { list-style: none; }
+        .file-item { padding: 8px 12px; border-bottom: 1px solid rgba(100, 181, 246, 0.1); cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .file-item:hover { background: rgba(100, 181, 246, 0.1); }
+        .breadcrumb { padding: 10px; background: rgba(0,0,0,0.3); margin-bottom: 10px; border-radius: 6px; font-family: monospace; color: #90caf9; display: flex; justify-content: space-between; }
+        .status-bar { position: absolute; bottom: 0; left: 0; right: 0; padding: 5px 15px; background: rgba(0,0,0,0.3); font-size: 12px; color: #90caf9; border-top: 1px solid rgba(100, 181, 246, 0.1); }
+
+        /* Терминал */
+        .term-output { background: #0d1117; padding: 10px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; height: calc(100% - 40px); overflow-y: auto; margin-bottom: 10px; white-space: pre-wrap; color: #c9d1d9; border: 1px solid #30363d; }
+        .term-input-line { display: flex; gap: 5px; }
+        .term-prompt { color: #00e676; font-family: 'Courier New', monospace; line-height: 32px; font-weight: bold; }
+        .term-input { flex: 1; background: transparent; border: none; color: #c9d1d9; font-family: 'Courier New', monospace; outline: none; }
+
+        /* Калькулятор */
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
+        .calc-btn { padding: 15px; background: rgba(100, 181, 246, 0.1); border: 1px solid rgba(100, 181, 246, 0.2); border-radius: 6px; color: #e3f2fd; font-size: 16px; cursor: pointer; }
+        .calc-btn:hover { background: rgba(100, 181, 246, 0.2); }
+        .calc-display { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(100, 181, 246, 0.2); color: #e3f2fd; font-size: 24px; text-align: right; border-radius: 6px; margin-bottom: 10px; font-family: monospace; }
+
+        /* Заметки */
+        .note-area { width: 100%; height: 100%; background: #1a237e; color: #e3f2fd; border: 1px solid rgba(100, 181, 246, 0.2); padding: 15px; font-family: monospace; font-size: 14px; resize: none; outline: none; border-radius: 6px; }
+
+        @media (max-width: 768px) { .window { min-width: 95vw; left: 2.5vw !important; top: 5vh !important; } }
+    </style>
+</head>
+<body>
+    <div id="desktop">
+        <div class="desktop-icons">
+            <div class="app-icon" onclick="openApp('files')"><div class="icon folder"></div><span>Файлы</span></div>
+            <div class="app-icon" onclick="openApp('browser')"><div class="icon browser"></div><span>Браузер</span></div>
+            <div class="app-icon" onclick="openApp('terminal')"><div class="icon terminal"></div><span>Терминал</span></div>
+            <div class="app-icon" onclick="openApp('notes')"><div class="icon notes"></div><span>Заметки</span></div>
+            <div class="app-icon" onclick="openApp('calc')"><div class="icon calc"></div><span>Калькулятор</span></div>
+            <div class="app-icon" onclick="openApp('settings')"><div class="icon settings"></div><span>Настройки</span></div>
+        </div>
+        <div id="windows-container"></div>
+    </div>
+
+    <div id="taskbar">
+        <div class="taskbar-left">
+            <button class="start-btn" onclick="toggleStart()">
+                <div class="icon-sm start-logo"></div>
+            </button>
+        </div>
+        <div class="taskbar-center" id="taskbar-apps"></div>
+        <div class="taskbar-right">
+            <span id="clock">00:00</span>
+        </div>
+    </div>
+
+    <div id="start-menu" class="hidden">
+        <h2>QwenOS</h2>
+        <div class="menu-item" onclick="openApp('files')"><div class="icon-sm folder"></div> Файлы</div>
+        <div class="menu-item" onclick="openApp('browser')"><div class="icon-sm browser"></div> Браузер</div>
+        <div class="menu-item" onclick="openApp('terminal')"><div class="icon-sm terminal"></div> Терминал</div>
+        <div class="menu-item" onclick="openApp('notes')"><div class="icon-sm notes"></div> Заметки</div>
+        <div class="menu-item" onclick="openApp('calc')"><div class="icon-sm calc"></div> Калькулятор</div>
+        <div class="menu-item" onclick="openApp('settings')"><div class="icon-sm settings"></div> Настройки</div>
+        
+        <div class="power-btn">
+            <div class="power-item" onclick="location.reload()">🔄 Перезагрузить</div>
+            <div class="power-item" onclick="document.body.innerHTML='<h1 style=\'color:#64b5f6;text-align:center;margin-top:40vh;font-family:monospace;\'>QwenOS выключена</h1>'">⏻ Выключить</div>
+        </div>
+    </div>
+
+    <script>
+        let winCount = 0;
+        let savedNotes = {};
+
+        // Часы
+        function updateClock() {
+            const n = new Date();
+            document.getElementById('clock').textContent = 
+                `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        // Меню Пуск
+        function toggleStart() { document.getElementById('start-menu').classList.toggle('hidden'); }
+        document.addEventListener('click', e => {
+            const m = document.getElementById('start-menu');
+            const b = document.querySelector('.start-btn');
+            if (!m.contains(e.target) && !b.contains(e.target)) m.classList.add('hidden');
+        });
+
+        // Загрузка заметок при старте
+        fetch('/api/notes').then(r=>r.json()).then(d=>{savedNotes=d;}).catch(()=>{});
+
+        // Открытие приложений
+        function openApp(name) {
+            winCount++;
+            const id = `win-${winCount}`;
+            const titles = { 
+                files: 'Файловый менеджер', browser: 'Браузер', settings: 'Настройки', 
+                terminal: 'Терминал', notes: 'Заметки', calc: 'Калькулятор' 
+            };
+            
+            const win = document.createElement('div');
+            win.className = 'window'; win.id = id;
+            win.style.left = `${50 + (winCount*20)}px`; win.style.top = `${30 + (winCount*20)}px`;
+            win.style.width = name === 'calc' ? '300px' : '600px'; 
+            win.style.height = name === 'calc' ? '450px' : '400px';
+            
+            win.innerHTML = `
+                <div class="window-header" onmousedown="startDrag(event, '${id}')">
+                    <div class="window-title">
+                        <div class="icon-sm ${name}" style="width:16px;height:16px;"></div>
+                        ${titles[name]}
+                    </div>
+                    <div class="window-controls">
+                        <button class="window-btn minimize" onclick="minWin('${id}')"></button>
+                        <button class="window-btn maximize" onclick="maxWin('${id}')"></button>
+                        <button class="window-btn close" onclick="closeWin('${id}')"></button>
+                    </div>
+                </div>
+                <div class="window-content" id="content-${id}"></div>
+            `;
+            
+            document.getElementById('windows-container').appendChild(win);
+            win.addEventListener('mousedown', () => makeActive(id));
+            
+            const content = document.getElementById(`content-${id}`);
+            
+            if (name === 'files') loadFiles(content, '');
+            else if (name === 'terminal') initTerm(content);
+            else if (name === 'browser') content.innerHTML = '<div style="padding:20px;text-align:center;"><h3>QwenOS Browser</h3><input type="text" id="url-'+id+'" placeholder="https://..." style="width:100%;padding:8px;margin:10px 0;background:rgba(100,181,246,0.1);border:1px solid rgba(100,181,246,0.2);border-radius:6px;color:#e3f2fd;"><button onclick="loadUrl(\''+id+'\')" style="padding:8px 15px;background:#64b5f6;border:none;border-radius:6px;color:white;cursor:pointer;">Перейти</button><iframe id="frame-'+id+'" style="width:100%;height:calc(100% - 100px);border:none;border-radius:6px;margin-top:10px;display:none;"></iframe></div>';
+            else if (name === 'settings') initSettings(content);
+            else if (name === 'notes') initNotes(content, id);
+            else if (name === 'calc') initCalc(content, id);
+            
+            makeActive(id);
+            document.getElementById('start-menu').classList.add('hidden');
+            addToTaskbar(id, name);
+        }
+
+        // Браузер
+        function loadUrl(id) {
+            const url = document.getElementById(`url-${id}`).value;
+            const frame = document.getElementById(`frame-${id}`);
+            if(url) {
+                frame.src = url.startsWith('http') ? url : 'https://' + url;
+                frame.style.display = 'block';
+            }
+        }
+
+        // НАСТРОЙКИ
+        function initSettings(container) {
+            container.innerHTML = '<div style="padding:20px;text-align:center;">Загрузка информации...</div>';
+            Promise.all([
+                fetch('/api/exec', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({cmd:'uname -a'})}).then(r=>r.json()),
+                fetch('/api/exec', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({cmd:'df -h / | tail -1'})}).then(r=>r.json()),
+                fetch('/api/exec', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({cmd:'whoami'})}).then(r=>r.json())
+            ]).then(([sys, disk, user]) => {
+                container.innerHTML = `
+                    <h3 style="color:#64b5f6;">QwenOS – Cloud Linux System v2.2</h3>
+                    <div style="margin-top:20px; display:grid; gap:15px;">
+                        <div style="background:rgba(100,181,246,0.1); padding:15px; border-radius:8px; border:1px solid rgba(100,181,246,0.2);">
+                            <strong style="color:#90caf9;">Пользователь:</strong> ${user.output.trim()}
+                        </div>
+                        <div style="background:rgba(100,181,246,0.1); padding:15px; border-radius:8px; border:1px solid rgba(100,181,246,0.2);">
+                            <strong style="color:#90caf9;">Ядро:</strong> ${sys.output.split('\n')[0]}
+                        </div>
+                        <div style="background:rgba(100,181,246,0.1); padding:15px; border-radius:8px; border:1px solid rgba(100,181,246,0.2);">
+                            <strong style="color:#90caf9;">Диск:</strong> ${disk.output.trim()}
+                        </div>
+                        <div style="background:rgba(100,181,246,0.1); padding:15px; border-radius:8px; border:1px solid rgba(100,181,246,0.2);">
+                            <strong style="color:#90caf9;">Сервер:</strong> Python 3.13 на Render
+                        </div>
+                        <div style="background:rgba(100,181,246,0.1); padding:15px; border-radius:8px; border:1px solid rgba(100,181,246,0.2);">
+                            <strong style="color:#90caf9;">Статус:</strong> 🟢 Работает в облаке
+                        </div>
+                    </div>
+                `;
+            }).catch(e => {
+                container.innerHTML = `<p style="color:red">Ошибка загрузки настроек: ${e}</p>`;
+            });
+        }
+
+        // ЗАМЕТКИ
+        function initNotes(container, id) {
+            const noteId = `note-${id}`;
+            const currentText = savedNotes[noteId] || '';
+            container.innerHTML = `
+                <textarea id="txt-${id}" class="note-area" placeholder="Пиши свои идеи здесь...">${currentText}</textarea>
+                <div style="position:absolute; bottom:15px; right:15px;">
+                    <button onclick="saveNote('${id}', '${noteId}')" style="padding:8px 15px; background:#64b5f6; border:none; border-radius:6px; color:white; cursor:pointer;">💾 Сохранить</button>
+                </div>
+            `;
+        }
+
+        function saveNote(winId, noteId) {
+            const text = document.getElementById(`txt-${winId}`).value;
+            savedNotes[noteId] = text;
+            fetch('/api/notes', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(savedNotes)
+            }).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '✅ Сохранено!';
+                setTimeout(() => btn.textContent = original, 1500);
+            }).catch(e => alert('Ошибка сохранения: ' + e));
+        }
+
+        // ФАЙЛОВЫЙ МЕНЕДЖЕР
+        async function loadFiles(container, path) {
+            container.innerHTML = '<div style="padding:20px;text-align:center;">Загрузка...</div>';
+            try {
+                const res = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
+                const data = await res.json();
+                
+                let html = `<div class="breadcrumb"><span>/ ${path || 'home'}</span> <span>${data.length} объектов</span></div><ul class="file-list">`;
+                if (path) html += `<li class="file-item" onclick="loadFiles(this.parentElement.parentElement, '${path.split('/').slice(0,-1).join('/')}')">
+                    <div style="width:20px;height:20px;background:#90caf9;border-radius:50%;display:inline-block;"></div> .. (Назад)</li>`;
+                    
+                data.forEach(item => {
+                    const iconClass = item.is_dir ? 'folder' : 'notes'; 
+                    const nextPath = path ? `${path}/${item.name}` : item.name;
+                    const action = item.is_dir 
+                        ? `loadFiles(this.parentElement.parentElement, '${nextPath}')` 
+                        : `showFileStatus('${item.name}', ${item.size})`;
+                    html += `<li class="file-item" onclick="${action}"><div class="icon-sm ${iconClass}" style="width:20px;height:20px;"></div> ${item.name}</li>`;
+                });
+                html += '</ul><div class="status-bar" id="status-bar">Готов</div>';
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<p style="color:red">Ошибка: ${e}</p>`;
+            }
+        }
+
+        function showFileStatus(name, size) {
+            const bar = document.querySelector('.status-bar');
+            if(bar) bar.textContent = `Файл: ${name} | Размер: ${size} байт`;
+        }
+
+        // ТЕРМИНАЛ
+        function initTerm(container) {
+            container.innerHTML = `
+                <div class="term-output" id="term-out">QwenOS Terminal [Cloud Linux v2.2]\nType 'help' for commands.\n\n</div>
+                <div class="term-input-line">
+                    <span class="term-prompt">qwen@cloud:~$</span>
+                    <input type="text" class="term-input" autofocus onkeydown="if(event.key==='Enter')execCmd(this)">
+                </div>
+            `;
+            container.querySelector('input').focus();
+        }
+
+        async function execCmd(input) {
+            const cmd = input.value.trim();
+            const out = document.getElementById('term-out');
+            out.textContent += `qwen@cloud:~$ ${cmd}\n`;
+            input.value = '';
+            
+            if (cmd === 'clear') { out.textContent = ''; return; }
+            if (cmd === 'help') { 
+                out.textContent += "Команды:\n  help, ls, pwd, whoami, clear, python, df, uname, neofetch\n\n"; 
+                return; 
+            }
+            
+            try {
+                const res = await fetch('/api/exec', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({cmd})
+                });
+                const data = await res.json();
+                out.textContent += data.output + '\n';
+            } catch(e) { out.textContent += `Error: ${e}\n`; }
+            out.scrollTop = out.scrollHeight;
+        }
+
+        // КАЛЬКУЛЯТОР
+        function initCalc(container, id) {
+            container.innerHTML = `
+                <input type="text" class="calc-display" id="calc-disp-${id}" readonly value="0">
+                <div class="calc-grid">
+                    <button class="calc-btn" onclick="calcInput('${id}', 'C')">C</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '/')">/</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '*')">×</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', 'back')">←</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '7')">7</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '8')">8</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '9')">9</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '-')">-</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '4')">4</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '5')">5</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '6')">6</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '+')">+</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '1')">1</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '2')">2</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '3')">3</button>
+                    <button class="calc-btn" style="grid-row: span 2; background: #64b5f6;" onclick="calcInput('${id}', '=')">=</button>
+                    <button class="calc-btn" style="grid-column: span 2;" onclick="calcInput('${id}', '0')">0</button>
+                    <button class="calc-btn" onclick="calcInput('${id}', '.')">.</button>
+                </div>
+            `;
+        }
+
+        function calcInput(id, val) {
+            const disp = document.getElementById(`calc-disp-${id}`);
+            if (val === 'C') disp.value = '0';
+            else if (val === 'back') disp.value = disp.value.slice(0, -1) || '0';
+            else if (val === '=') {
+                try { disp.value = eval(disp.value); } catch { disp.value = 'Error'; }
+            } else {
+                disp.value = disp.value === '0' ? val : disp.value + val;
+            }
+        }
+
+        // Управление окнами
+        function closeWin(id) { document.getElementById(id)?.remove(); removeFromTaskbar(id); }
+        function minWin(id) { const w=document.getElementById(id); if(w) w.style.display='none'; }
+        function maxWin(id) {
+            const w=document.getElementById(id); if(!w) return;
+            if(w.dataset.max==='1') { w.style.cssText=''; w.dataset.max='0'; }
+            else { w.style.width='100vw'; w.style.height='calc(100vh - 48px)'; w.style.left='0'; w.style.top='0'; w.dataset.max='1'; }
+        }
+        function makeActive(id) {
+            document.querySelectorAll('.window').forEach(w=>w.style.zIndex=1);
+            const w=document.getElementById(id); if(w) w.style.zIndex=100;
+        }
+
+        // Drag & Drop
+        let dragW=null, offX=0, offY=0;
+        function startDrag(e, id) {
+            dragW=document.getElementById(id);
+            const r=dragW.getBoundingClientRect(); offX=e.clientX-r.left; offY=e.clientY-r.top;
+            document.onmousemove=e=>{ if(dragW){dragW.style.left=e.clientX-offX+'px';dragW.style.top=e.clientY-offY+'px';} };
+            document.onmouseup=()=>{ dragW=null; document.onmousemove=null; };
+        }
+
+        // Панель задач
+        function addToTaskbar(wid, name) {
+            const t=document.getElementById('taskbar-apps');
+            const b=document.createElement('div'); b.className='taskbar-app'; b.id=`tb-${wid}`;
+            b.innerHTML=`<div class="icon-sm ${name}" style="width:20px;height:20px;"></div>`;
+            b.onclick=()=>{ const w=document.getElementById(wid); if(w.style.display==='none'){w.style.display='flex';makeActive(wid);} else makeActive(wid); };
+            t.appendChild(b);
+        }
+        function removeFromTaskbar(wid) { document.getElementById(`tb-${wid}`)?.remove(); }
+
+        const s=document.createElement('style');
+        s.textContent=`.taskbar-app{padding:6px 10px;background:rgba(100,181,246,0.1);border:1px solid rgba(100,181,246,0.2);border-radius:6px;cursor:pointer;display:flex;align-items:center;}.taskbar-app:hover{background:rgba(100,181,246,0.2);}`;
+        document.head.appendChild(s);
+    </script>
+</body>
+  </html>
